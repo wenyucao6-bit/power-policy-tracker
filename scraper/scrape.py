@@ -14,12 +14,14 @@ import traceback
 from typing import Dict, List
 
 from . import db
-from .sources import cre_france, ei_sweden, acer_eu
+from .sources import cre_france, ei_sweden, acer_eu, svenska_kraftnat, european_commission
 
 SOURCES = [
     ("cre_france", cre_france),
     ("ei_sweden", ei_sweden),
     ("acer_eu", acer_eu),
+    ("svenska_kraftnat", svenska_kraftnat),
+    ("european_commission", european_commission),
 ]
 
 
