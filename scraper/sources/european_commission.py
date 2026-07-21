@@ -8,7 +8,7 @@ from typing import List, Dict
 
 from .base import fetch_html, parse_rss
 
-SOURCE_NAME = "European Commission DG Energy (欧盟)"
+SOURCE_NAME = "European Commission DG Energy"
 RSS_URL = "https://energy.ec.europa.eu/node/2/rss_en"
 
 

@@ -13,7 +13,7 @@ from typing import List, Dict
 
 from .base import fetch_html, make_absolute_url, soupify
 
-SOURCE_NAME = "ACER (欧盟)"
+SOURCE_NAME = "ACER"
 LIST_URL = "https://www.acer.europa.eu/news-and-events/news"
 BASE_URL = "https://www.acer.europa.eu"
 

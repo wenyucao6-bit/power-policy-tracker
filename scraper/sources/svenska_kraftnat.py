@@ -8,7 +8,7 @@ from typing import List, Dict
 
 from .base import fetch_html, parse_rss
 
-SOURCE_NAME = "Svenska kraftnät (瑞典)"
+SOURCE_NAME = "Svenska kraftnät"
 RSS_URL = "https://www.svk.se/Api/RSSFeed/GetAllNews"
 
 

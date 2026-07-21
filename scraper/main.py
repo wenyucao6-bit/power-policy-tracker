@@ -92,7 +92,7 @@ def render_html(items: List[Dict], updated_at: str) -> str:
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>欧盟/法国/瑞典 电力市场政策追踪</title>
+<title>European Power Policy Monitor</title>
 <style>
   :root {{
     --bg: #0f1420;
@@ -171,7 +171,7 @@ def render_html(items: List[Dict], updated_at: str) -> str:
 </head>
 <body>
 <header>
-  <h1>⚡ 欧盟 / 法国 / 瑞典 电力市场政策追踪</h1>
+  <h1>⚡ European Power Policy Monitor</h1>
   <p>数据来源：CRE（法国能源监管委员会）、Ei（瑞典能源市场监察局）、ACER（欧盟能源监管机构合作署）。最后更新：{esc(updated_at)}</p>
 </header>
 <main>

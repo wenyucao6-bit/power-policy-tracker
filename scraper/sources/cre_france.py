@@ -18,7 +18,7 @@ from typing import List, Dict
 
 from .base import fetch_html, make_absolute_url, soupify
 
-SOURCE_NAME = "CRE (法国)"
+SOURCE_NAME = "CRE"
 LIST_URL = "https://www.cre.fr/actualites/toute-lactualite.html"
 BASE_URL = "https://www.cre.fr"
 

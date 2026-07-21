@@ -21,7 +21,7 @@ from typing import List, Dict
 
 from .base import fetch_html, make_absolute_url, soupify
 
-SOURCE_NAME = "Ei (瑞典)"
+SOURCE_NAME = "Ei"
 BASE_URL = "https://ei.se"
 LIST_URL = (
     BASE_URL
