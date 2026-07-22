@@ -29,7 +29,7 @@ COUNTRY_MAP = {
     "Svenska kraftnät": "🇸🇪 Sweden",
     "ACER": "🇪🇺 EU",
     "European Commission DG Energy": "🇪🇺 EU",
-    "RTE": "🇫🇷 France"
+    "RTE": "🇫🇷 France",
     "RTE Publications": "🇫🇷 France",
     "ENTSO-E": "🇪🇺 EU",
     "Nord Pool": "🇪🇺 EU",
