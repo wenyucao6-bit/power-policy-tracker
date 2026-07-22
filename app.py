@@ -25,14 +25,14 @@ st.set_page_config(
 # 每个数据源归属哪个国家/地区，用于按国家分栏展示
 COUNTRY_MAP = {
     "CRE": "🇫🇷 France",
-    "Ei": "🇸🇪 Sweden",
-    "Svenska kraftnät": "🇸🇪 Sweden",
-    "ACER": "🇪🇺 EU",
-    "European Commission DG Energy": "🇪🇺 EU",
     "RTE": "🇫🇷 France",
     "RTE Publications": "🇫🇷 France",
+    "Ei": "🇸🇪 Sweden",
+    "Svenska kraftnät": "🇸🇪 Sweden",
+    "Nord Pool": "🇸🇪 Sweden",
+    "ACER": "🇪🇺 EU",
+    "European Commission DG Energy": "🇪🇺 EU",
     "ENTSO-E": "🇪🇺 EU",
-    "Nord Pool": "🇪🇺 EU",
 }
 COUNTRY_ORDER = ["🇪🇺 EU", "🇫🇷 France", "🇸🇪 Sweden"]
 
@@ -199,6 +199,9 @@ with st.sidebar:
             selected_categories.append(cat)
 
     st.divider()
+    sort_mode = st.radio("排序方式", ["按来源分组", "按日期混排"], index=0)
+
+    st.divider()
     search_text = st.text_input("搜索标题关键词", placeholder="例如：tarif、capacity、nätavgift...")
     st.caption(f"数据库位置：{db.DB_PATH}")
 
@@ -214,28 +217,41 @@ else:
         with col:
             st.subheader(country)
             sources_in_country = [s for s in selected_sources if COUNTRY_MAP.get(s, s) == country]
-            shown_any = False
+
+            all_visible = []  # list of (source, item, item_categories)
             for source in sources_in_country:
                 items = db.fetch_all(conn, source=source, search=search_text or None)
                 for it in items:
                     item_categories = match_categories(it["title"])
-                    # 如果这条新闻匹配到了分类，但没有一个分类被勾选，就跳过
                     if item_categories and not any(c in selected_categories for c in item_categories):
                         continue
-                    shown_any = True
-                    date_txt = it["published"] or "日期未知"
-                    cat_tags = "".join(
-                        f'<span class="category-tag">{c}</span>' for c in item_categories
-                    )
-                    st.markdown(
-                        f"""<div class="news-card">
-                            <span class="source-tag">{source}</span>{cat_tags}
-                            <span class="news-date">{date_txt}</span>
-                            <a href="{it['url']}" target="_blank">{it['title']}</a>
-                        </div>""",
-                        unsafe_allow_html=True,
-                    )
-            if not shown_any:
+                    all_visible.append((source, it, item_categories))
+
+            if not all_visible:
                 st.caption("暂无匹配结果")
+                continue
+
+            if sort_mode == "按日期混排":
+                all_visible.sort(key=lambda x: (x[1].get("published") or ""), reverse=True)
+            else:
+                # 按来源排序：同一来源的卡片挨在一起，来源内部再按日期倒序
+                all_visible.sort(key=lambda x: (x[0], x[1].get("published") or ""), reverse=True)
+                all_visible.sort(key=lambda x: x[0])  # 保证来源分组连续，但组内维持刚才的日期倒序
+
+            for source, it, item_categories in all_visible:
+                date_txt = it["published"] or "日期未知"
+                cat_tags = "".join(
+                    f'<span class="category-tag">{c}</span>' for c in item_categories
+                )
+                # 注意：这里故意不用多行缩进的f-string，Streamlit的markdown解析器
+                # 会把缩进的行误判成"代码块"，导致HTML显示成裸文本而不是渲染出来。
+                html = (
+                    f'<div class="news-card">'
+                    f'<span class="source-tag">{source}</span>{cat_tags}'
+                    f'<span class="news-date">{date_txt}</span>'
+                    f'<a href="{it["url"]}" target="_blank">{it["title"]}</a>'
+                    f'</div>'
+                )
+                st.markdown(html, unsafe_allow_html=True)
 
 conn.close()
