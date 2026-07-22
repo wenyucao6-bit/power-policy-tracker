@@ -14,7 +14,7 @@ import traceback
 from typing import Dict, List
 
 from . import db
-from .sources import cre_france, ei_sweden, acer_eu, svenska_kraftnat, european_commission
+from .sources import cre_france, ei_sweden, acer_eu, svenska_kraftnat, european_commission, rte_france, entsoe_eu, nordpool_eu
 
 SOURCES = [
     ("cre_france", cre_france),
@@ -22,6 +22,9 @@ SOURCES = [
     ("acer_eu", acer_eu),
     ("svenska_kraftnat", svenska_kraftnat),
     ("european_commission", european_commission),
+    ("rte_france", rte_france),
+    ("entsoe_eu", entsoe_eu),
+    ("nordpool_eu", nordpool_eu),
 ]
 
 

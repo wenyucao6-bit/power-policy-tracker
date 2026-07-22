@@ -10,13 +10,16 @@
 import sys
 from pathlib import Path
 
-from .sources import cre_france, ei_sweden, acer_eu
+from .sources import cre_france, ei_sweden, acer_eu, rte_france, entsoe_eu, nordpool_eu
 from .sources.base import fetch_html
 
 SOURCES = {
     "cre": cre_france.LIST_URL,
     "ei": ei_sweden.LIST_URL,
     "acer": acer_eu.LIST_URL,
+    "rte": rte_france.LIST_URL,
+    "entsoe": entsoe_eu.LIST_URL,
+    "nordpool": nordpool_eu.RSS_URL,
 }
 
 
