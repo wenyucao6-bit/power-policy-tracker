@@ -15,6 +15,7 @@ from collections import Counter
 import streamlit as st
 
 from scraper import db
+from scraper.regions import COUNTRY_MAP, COUNTRY_ORDER
 
 st.set_page_config(
     page_title="European Power Policy Monitor",
@@ -22,19 +23,8 @@ st.set_page_config(
     layout="wide",
 )
 
-# 每个数据源归属哪个国家/地区，用于按国家分栏展示
-COUNTRY_MAP = {
-    "CRE": "🇫🇷 France",
-    "RTE": "🇫🇷 France",
-    "RTE Publications": "🇫🇷 France",
-    "Ei": "🇸🇪 Sweden",
-    "Svenska kraftnät": "🇸🇪 Sweden",
-    "Nord Pool": "🇸🇪 Sweden",
-    "ACER": "🇪🇺 EU",
-    "European Commission DG Energy": "🇪🇺 EU",
-    "ENTSO-E": "🇪🇺 EU",
-}
-COUNTRY_ORDER = ["🇪🇺 EU", "🇫🇷 France", "🇸🇪 Sweden"]
+# 数据源→地区的映射统一放在 scraper/regions.py 里维护（app.py和后台抓取脚本共用同一份，
+# 避免像之前ACER那样两边各写一份导致不同步的bug）
 
 # 关键词分类：标题里出现下面任一关键词，就归到对应分类（不用AI，纯字符串匹配）
 CATEGORY_KEYWORDS = {
@@ -166,6 +156,12 @@ with st.container():
         else:
             st.caption("暂无数据")
     st.markdown('</div>', unsafe_allow_html=True)
+
+# ---------- AI 每周简报 ----------
+latest_brief = db.get_latest_brief(conn)
+if latest_brief:
+    with st.expander(f"📋 AI 每周市场政策简报（生成于 {latest_brief['generated_at']}）", expanded=True):
+        st.markdown(latest_brief["content"])
 
 st.divider()
 

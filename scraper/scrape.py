@@ -14,6 +14,7 @@ import traceback
 from typing import Dict, List
 
 from . import db
+from . import ai_report
 from .sources import cre_france, ei_sweden, acer_eu, svenska_kraftnat, european_commission, rte_france, entsoe_eu, nordpool_eu
 
 SOURCES = [
@@ -50,6 +51,14 @@ def main():
 
     counts = db.count_by_source(conn)
     total = sum(counts.values())
+
+    recent_items = db.fetch_recent(conn, days=7)
+    print(f"最近7天共有 {len(recent_items)} 条新闻，准备生成AI周报...")
+    report = ai_report.generate_weekly_report(recent_items)
+    if report:
+        db.save_weekly_brief(conn, report)
+        print("AI周报已生成并保存")
+
     conn.close()
 
     print(f"数据库现有 {total} 条记录，按来源统计: {counts}")
