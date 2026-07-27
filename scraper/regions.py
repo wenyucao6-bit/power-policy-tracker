@@ -8,6 +8,7 @@ COUNTRY_MAP = {
     "CRE": "🇫🇷 France",
     "RTE": "🇫🇷 France",
     "RTE Publications": "🇫🇷 France",
+    "RTE Services": "🇫🇷 France",
     "Ei": "🇸🇪 Sweden",
     "Svenska kraftnät": "🇸🇪 Sweden",
     "Nord Pool": "🇸🇪 Sweden",
