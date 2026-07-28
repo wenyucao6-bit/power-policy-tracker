@@ -16,7 +16,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List
 
-from .sources import cre_france, ei_sweden, acer_eu, entsoe_eu, rte_france, nordpool_eu, svenska_kraftnat, european_commission
+from .sources import cre_france, ei_sweden, acer_eu, entsoe_eu, rte_france, nordpool_eu, svenska_kraftnat, european_commission, rte_service_france
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA_FILE = ROOT / "data" / "news.json"
@@ -31,6 +31,7 @@ SOURCES = [
     ("nordpool_eu", nordpool_eu),
     ("svenska_kraftnät", svenska_kraftnat),
     ("european_commission", european_commission),
+    ("rte_service_france", rte_service_france)
 ]
 
 
