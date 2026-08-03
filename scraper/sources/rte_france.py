@@ -14,17 +14,29 @@ from __future__ import annotations
 from datetime import datetime
 from typing import List, Dict
 
-from .base import fetch_html, make_absolute_url, soupify
+import requests
+
+from .base import HEADERS, TIMEOUT, make_absolute_url, soupify
 
 SOURCE_NAME = "RTE"
 PUBLICATIONS_SOURCE_NAME = "RTE Publications"
 LIST_URL = "https://www.rte-france.com/presse"
 BASE_URL = "https://www.rte-france.com"
 
+# 用同一个session访问两个函数需要的页面，模拟真实浏览器"先建立会话再请求"的顺序，
+# 避免裸请求偶尔遇到重定向循环（"Exceeded 30 redirects"）的问题
+_session = requests.Session()
+
+
+def _get_html(url: str) -> str:
+    resp = _session.get(url, headers=HEADERS, timeout=TIMEOUT)
+    resp.raise_for_status()
+    return resp.text
+
 
 def _fetch_press_releases_page(page: int) -> List[Dict]:
     url = LIST_URL if page == 0 else f"{LIST_URL}?page={page}"
-    html = fetch_html(url)
+    html = _get_html(url)
     soup = soupify(html)
 
     items: List[Dict] = []
@@ -61,7 +73,7 @@ def _fetch_press_releases() -> List[Dict]:
 def _fetch_publications() -> List[Dict]:
     """抓"Les essentiels presse"精选文档区块（PDF报告）。
     这部分内容只在第一页出现，不用翻页。"""
-    html = fetch_html(LIST_URL)
+    html = _get_html(LIST_URL)
     soup = soupify(html)
 
     items: List[Dict] = []

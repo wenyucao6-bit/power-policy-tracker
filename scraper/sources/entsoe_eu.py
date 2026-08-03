@@ -1,63 +1,69 @@
 """
-抓取 ENTSO-E 的新闻。
+抓取 ENTSO-E 官网首页的"Latest News"板块（不再依赖第三方rss.app服务）。
 
-ENTSO-E官网的新闻列表页 (https://www.entsoe.eu/news-events/news/) 是JS异步加载的，
-直接抓取拿不到内容，也没找到合规的官方RSS/API。这里改用第三方"网页转RSS"工具
-(rss.app) 生成的RSS地址，它帮我们处理了JS渲染的问题。
+之前用的是rss.app生成的第三方RSS，后来遇到"402 Payment Required"（免费额度用完），
+所以放弃第三方路线。改用ENTSO-E官网首页(entsoe.eu)——这个首页本身是服务端直出的，
+带一个"Latest News"板块，展示最新的几条新闻（标题+日期+链接），不需要JS渲染就能拿到。
 
-⚠️ 依赖第三方服务，如果这个RSS地址失效（比如免费额度到期），需要重新生成一个
-并更新下面的 RSS_URL。
+⚠️ 这个是根据一次抓取结果写的选择器，还没有拿到真实原始HTML核对过具体的CSS结构。
+如果跑出来是空的，运行:
+    python -m scraper.debug_fetch entsoe
+把原始HTML存到 data/debug/entsoe.html，用浏览器"检查元素"看一下"Latest News"
+这个板块实际的HTML结构，再调整下面的选择器。
 
-这个feed里混杂了新闻(NEWS)和活动预告(EVENT)两种内容（用description开头的
-[NEWS]/[EVENT]标签区分），这里只保留新闻，活动预告(webinar通知之类)跟政策
-动态关系不大，先过滤掉。
+限制：首页的"Latest News"板块通常只展示最新的5条左右，不是完整历史存档，
+但对日常增量抓取来说足够（新文章总会先出现在首页）。
 """
 from __future__ import annotations
 
+import re
 from typing import List, Dict
-from xml.etree import ElementTree as ET
-from email.utils import parsedate_to_datetime
 
-from .base import fetch_html, make_absolute_url
+from .base import fetch_html, make_absolute_url, soupify
 
 SOURCE_NAME = "ENTSO-E"
+LIST_URL = "https://www.entsoe.eu/"
 BASE_URL = "https://www.entsoe.eu"
-RSS_URL = "https://rss.app/feeds/043Zhn5HHw4gj99D.xml"
+
+DATE_RE = re.compile(r"(\d{1,2}/\d{1,2}/\d{4})")
 
 
-def fetch_items(limit: int = 30) -> List[Dict]:
-    xml_text = fetch_html(RSS_URL)
-    root = ET.fromstring(xml_text)
+def fetch_items(limit: int = 20) -> List[Dict]:
+    html = fetch_html(LIST_URL)
+    soup = soupify(html)
 
     items: List[Dict] = []
-    for item in root.findall(".//item"):
-        title_el = item.find("title")
-        link_el = item.find("link")
-        desc_el = item.find("description")
-        date_el = item.find("pubDate")
+    seen_urls = set()
 
-        title = (title_el.text or "").strip() if title_el is not None else None
-        link = (link_el.text or "").strip() if link_el is not None else None
-        description = (desc_el.text or "") if desc_el is not None else ""
+    # "Latest News"板块里的新闻链接，href形如 /news/2026/07/23/xxx-slug/
+    news_links = [
+        a for a in soup.find_all("a", href=True)
+        if re.match(r"^/news/\d{4}/\d{2}/\d{2}/", a["href"])
+    ]
 
-        if not title or not link:
+    for a in news_links:
+        title = a.get_text(strip=True)
+        if not title:
             continue
 
-        # 只保留新闻，过滤掉活动预告(webinar通知等)
-        if "[EVENT]" in description and "[NEWS]" not in description:
+        url = make_absolute_url(BASE_URL, a["href"])
+        if url in seen_urls:
             continue
+        seen_urls.add(url)
 
+        # 日期通常紧挨着标题链接出现（在标题前面），向前扫描找 DD/MM/YYYY 格式的日期文本
         published = None
-        if date_el is not None and date_el.text:
-            try:
-                published = parsedate_to_datetime(date_el.text.strip()).date().isoformat()
-            except (TypeError, ValueError):
-                pass
+        for el in a.find_all_previous(string=True, limit=10):
+            match = DATE_RE.search(str(el))
+            if match:
+                d, m, y = match.group(1).split("/")
+                published = f"{y}-{m.zfill(2)}-{d.zfill(2)}"
+                break
 
         items.append({
             "source": SOURCE_NAME,
             "title": title,
-            "url": make_absolute_url(BASE_URL, link),
+            "url": url,
             "published": published,
         })
 

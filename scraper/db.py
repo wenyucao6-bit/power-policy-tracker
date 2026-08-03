@@ -49,11 +49,7 @@ def get_connection(db_path: Path = DB_PATH) -> sqlite3.Connection:
 def upsert_items(conn: sqlite3.Connection, items: List[Dict]) -> None:
     """插入新条目；如果url已存在则更新标题/日期（不重复插入，也不丢失first_seen）"""
     success_count = 0
-    matching = [it for it in items if "services-rte" in it.get("url", "")]
-    print(f"[调试] 传入函数的items总数: {len(items)}，其中url含services-rte的: {len(matching)}")
     for item in items:
-        if "services-rte" in item.get("url", ""):
-            print(f"[调试] 正在写入: source={item.get('source')!r}, url={item.get('url')}")
         try:
             conn.execute(
                 """
