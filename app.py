@@ -16,6 +16,8 @@ import streamlit as st
 
 from scraper import db
 from scraper.regions import COUNTRY_MAP, COUNTRY_ORDER
+from scraper.export_report import markdown_report_to_docx
+
 
 st.set_page_config(
     page_title="European Power Policy Monitor",
@@ -162,6 +164,17 @@ latest_brief = db.get_latest_brief(conn)
 if latest_brief:
     with st.expander(f"📋 AI 每周市场政策简报（生成于 {latest_brief['generated_at']}）", expanded=True):
         st.markdown(latest_brief["content"])
+
+        docx_bytes = markdown_report_to_docx(
+            latest_brief["content"],
+            "European Power Policy Monitor - 每周简报"
+        )
+        st.download_button(
+            label="📄 Download",
+            data=docx_bytes,
+            file_name=f"周报_{latest_brief['brief_date']}.docx",
+            mime="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        )
 
 st.divider()
 
