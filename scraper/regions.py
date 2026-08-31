@@ -15,6 +15,7 @@ COUNTRY_MAP = {
     "ACER": "🇪🇺 EU",
     "European Commission DG Energy": "🇪🇺 EU",
     "ENTSO-E": "🇪🇺 EU",
+    "EDF OA": "🇫🇷 France"
 }
 
 COUNTRY_ORDER = ["🇪🇺 EU", "🇫🇷 France", "🇸🇪 Sweden"]

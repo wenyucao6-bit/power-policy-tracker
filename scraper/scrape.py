@@ -15,7 +15,7 @@ from typing import Dict, List
 
 from . import db
 from . import ai_report
-from .sources import cre_france, ei_sweden, acer_eu, svenska_kraftnat, european_commission, rte_france, entsoe_eu, nordpool_eu, rte_service_france
+from .sources import cre_france, ei_sweden, acer_eu, svenska_kraftnat, european_commission, rte_france, entsoe_eu, nordpool_eu, rte_service_france, edf_oa_france
 
 SOURCES = [
     ("cre_france", cre_france),
@@ -27,6 +27,7 @@ SOURCES = [
     ("entsoe_eu", entsoe_eu),
     ("nordpool_eu", nordpool_eu),
     ("rte_service_france", rte_service_france),
+    ("edf_oa_france", edf_oa_france)
 ]
 
 
